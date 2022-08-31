@@ -46,22 +46,16 @@ def procedure(targ_language):
     displaying_and_saving(translation_list, examples_list, word, targ_language)
 
 headers = {'User-Agent': 'Mozilla/5.0'}
-print("Hello, welcome to the translator. Translator supports:")
-
 languages = ["Arabic", "German", "English", "Spanish", "French", "Hebrew", "Japanese", "Dutch", "Polish", "Portuguese", "Romanian", "Russian", "Turkish"]
-for i, j in enumerate(languages):
-    print(i, ".", j, sep=None)
-curr_number_language = int(input('Type the number of your language: '))
-curr_language = languages[curr_number_language - 1]
 
-targ_number_language = int(input("Type the number of a language you want to translate to or '0' to translate to all languages:"))
+curr_language = sys.argv[1]
+targ_language = sys.argv[2]
+word = sys.argv[3]
 
-word = input("Type the word you want to translate:")
-if targ_number_language == 0:
+if targ_language == "all":
     for i in languages:
         r = re.get(f"https://context.reverso.net/translation/{curr_language.lower()}-{i.lower()}/{word}", headers=headers)
         procedure(i)
 else:
-    targ_language = languages[targ_number_language - 1]
     r = re.get(f"https://context.reverso.net/translation/{curr_language.lower()}-{targ_language.lower()}/{word}", headers=headers)
     procedure(targ_language)
