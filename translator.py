@@ -39,23 +39,50 @@ def displaying_and_saving(translations_list, examples_list, name, targ_language)
         f.write("\n")
         print()
 
+class LanguageSupportError(Exception):
+    def __str__(self):
+        return "Sorry, the program doesn't support"
+
+def language_checker(a):
+    try:
+        if a not in languages:
+            raise LanguageSupportError
+    except LanguageSupportError as err:
+        print(err, a)
+
 def procedure(targ_language):
     soup = BeautifulSoup(r.content, "html.parser")
     translation_list = scraping_translations(soup)
     examples_list = scraping_examples(soup)
     displaying_and_saving(translation_list, examples_list, word, targ_language)
 
+class StatusCodeError(Exception):
+    def __init__(self, text):
+        self.message = text
+        super().__init__(self.message)
+
+def connection_checker(r, word):
+    if r.status_code == 404:
+        print(f"Sorry, unable to find {word}")
+        sys.exit()
+
 headers = {'User-Agent': 'Mozilla/5.0'}
-languages = ["Arabic", "German", "English", "Spanish", "French", "Hebrew", "Japanese", "Dutch", "Polish", "Portuguese", "Romanian", "Russian", "Turkish"]
+languages = ["arabic", "german", "english", "spanish", "french", "hebrew", "japanese", "dutch", "polish", "portuguese", "romanian", "russian", "turkish", "all"]
+
 
 curr_language = sys.argv[1]
+language_checker(curr_language)
 targ_language = sys.argv[2]
+language_checker(targ_language)
+
 word = sys.argv[3]
 
 if targ_language == "all":
     for i in languages:
         r = re.get(f"https://context.reverso.net/translation/{curr_language.lower()}-{i.lower()}/{word}", headers=headers)
+        connection_checker(r, word)
         procedure(i)
 else:
     r = re.get(f"https://context.reverso.net/translation/{curr_language.lower()}-{targ_language.lower()}/{word}", headers=headers)
+    connection_checker(r, word)
     procedure(targ_language)
